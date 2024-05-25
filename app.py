@@ -55,7 +55,7 @@ else:
     st.stop()
     
 # выводим первые 10 наблюдений
-st.dataframe(data_df)
+st.dataframe(data_df, index_col=0)
 
 # переводим данные в формат ETNA
 df = TSDataset.to_dataset(data_df)
@@ -75,49 +75,7 @@ if series_visualize == "Нет":
     pass
 else:
     st.pyplot(ts.plot())
-    
-# радиокнопка - построить периодограмму или нет
-periodogram_visualize = st.radio(
-    "Построить периодограмму?",
-    ("Нет", "Да"))
 
-# если не нужно строить, ничего не делаем,
-# а если нужно, строим периодограмму
-if periodogram_visualize == "Нет":
-    pass
-else:
-    st.pyplot(plot_periodogram(
-        ts=ts, period=365.24,
-        xticks=[1, 2, 4, 6, 12, 26, 52])
-             )
-
-# радиокнопка - визуализировать тренд или нет
-trend_visualize = st.radio(
-    "Визуализировать тренд?",
-    ("Нет", "Да"))
-
-# если не нужно визуализировать, ничего не делаем,
-# а если нужно, визуализируем тренд (линейный, 
-# кусочно-линейный, линейный, полученный с
-# помощью оценки Тейла-Сена)
-if trend_visualize == "Нет":
-    pass
-else:
-    st.pyplot(plot_trend(
-        ts=ts,
-        trend_transform=[
-            LinearTrendTransform(in_column='target'),
-            ChangePointsTrendTransform(in_column='target'),
-            TheilSenTrendTransform(in_column='target')])
-             )
-
-# задаем заголовок раздела
-st.header("Горизонт прогнозирования")
-
-# ввод горизонта прогнозирования
-HORIZON = st.number_input(
-    "Задайте горизонт прогнозирования", 
-    min_value=1, value=14)
 
 # разбиваем исторический набор на обучающий и тестовый
 train_ts, test_ts = ts.train_test_split(
