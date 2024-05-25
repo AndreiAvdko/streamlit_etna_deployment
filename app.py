@@ -50,12 +50,12 @@ data_file = st.file_uploader("Загрузите ваш CSV-файл")
 
 # загружаем данные или останавливаем приложение
 if data_file is not None:   
-    data_df = pd.read_csv(data_file)
+    data_df = pd.read_csv(data_file, index_col=0)
 else:
     st.stop()
     
 # выводим первые 10 наблюдений
-st.dataframe(data_df, index_col=0)
+st.dataframe(data_df)
 
 # переводим данные в формат ETNA
 df = TSDataset.to_dataset(data_df)
