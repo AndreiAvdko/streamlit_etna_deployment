@@ -3,30 +3,7 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import optuna
-
-# импортируем классы ETNA
-from etna.datasets import TSDataset
-from etna.models import (CatBoostPerSegmentModel, 
-                         CatBoostMultiSegmentModel)
-from etna.transforms import (
-    LogTransform,
-    TimeSeriesImputerTransform,
-    LinearTrendTransform,
-    ChangePointsTrendTransform,
-    TheilSenTrendTransform,
-    LagTransform,
-    DateFlagsTransform,
-    FourierTransform,
-    SegmentEncoderTransform,
-    MeanTransform
-)
-from etna.metrics import SMAPE
-from etna.pipeline import Pipeline
-from etna.analysis import (plot_forecast,
-                           plot_backtest,
-                           plot_periodogram,
-                           plot_trend)
-from etna.auto import Tune
+import solar_wind.solar_wind as sw
 
 # отключаем вывод ненужного предупреждения
 st.set_option("deprecation.showPyplotGlobalUse", False)
@@ -50,16 +27,21 @@ data_file = st.file_uploader("Загрузите ваш CSV-файл")
 
 # загружаем данные или останавливаем приложение
 if data_file is not None:   
-    data_df = pd.read_csv(data_file, index_col=0)
+    try:
+        data_df = pd.read_csv(data_file, index_col=0)
+    except:
+        st.write("Проверьте формат ваших данных. С ними что-то не так")
+        st.stop()
 else:
     st.stop()
+
     
 # выводим первые 10 наблюдений
 st.dataframe(data_df)
 
-# переводим данные в формат ETNA
-df = TSDataset.to_dataset(data_df)
-ts = TSDataset(df, freq="D")
+predict = sw.get_forecast(data_df)
+st.dataframe(predict)
+
 
 # задаем заголовок раздела
 st.header("Разведочный анализ рядов")
